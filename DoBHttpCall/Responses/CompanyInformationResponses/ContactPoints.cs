@@ -1,4 +1,4 @@
-﻿namespace DoBHttpCall.Responses.CompanyInformationResponses;
+namespace DoBHttpCall.Responses.CompanyInformationResponses;
 
 public class ContactPoints
 {

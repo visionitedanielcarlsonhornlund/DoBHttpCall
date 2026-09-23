@@ -1,6 +1,6 @@
-﻿namespace DoBHttpCall.Responses.CompanyInformationResponses;
+namespace DoBHttpCall.Responses.CompanyInformationResponses;
 
 public class PhoneNumber
 {
-    public string? FullNumber   { get; set; }
+    public string? FullNumber { get; set; }
 }

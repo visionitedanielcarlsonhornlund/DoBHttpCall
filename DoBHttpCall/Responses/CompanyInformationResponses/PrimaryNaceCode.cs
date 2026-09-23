@@ -1,7 +1,7 @@
-﻿namespace DoBHttpCall.Responses.CompanyInformationResponses;
+namespace DoBHttpCall.Responses.CompanyInformationResponses;
 
 public class PrimaryNaceCode
 {
-    public string? Code   { get; set; }
-    public string? Description   { get; set; }
+    public string? Code { get; set; }
+    public string? Description { get; set; }
 }

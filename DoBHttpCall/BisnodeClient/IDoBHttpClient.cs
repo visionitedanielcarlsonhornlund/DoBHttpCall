@@ -1,4 +1,4 @@
-﻿using DoBHttpCall.Responses.CompanyInformationResponses;
+using DoBHttpCall.Responses.CompanyInformationResponses;
 
 namespace DoBHttpCall.Clients;
 

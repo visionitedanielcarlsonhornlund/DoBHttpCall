@@ -1,4 +1,4 @@
-﻿using DoBHttpCall.Responses.CompanyInformationResponses;
+using DoBHttpCall.Responses.CompanyInformationResponses;
 using DoBHttpCall.Responses.Tokens;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -8,11 +8,11 @@ using System.Text;
 
 namespace DoBHttpCall.Clients;
 
-public class DoBHttpClient : IDoBHttpClient
+public sealed class DoBHttpClient : IDoBHttpClient
 {
     private static readonly string[] Segments = ["COMPANY_INFORMATION"];
-    private static readonly string BisnodeTokenEndpoint = "https://login.bisnode.com/sandbox/v1/token.oauth2";
-    private static readonly string BisnodeCompanyInformationEndpoint = "https://sandbox-api.bisnode.com/credit-data-companies/v2/companies/se";
+    private const string BisnodeTokenEndpoint = "https://login.bisnode.com/sandbox/v1/token.oauth2";
+    private const string BisnodeCompanyInformationEndpoint = "https://sandbox-api.bisnode.com/credit-data-companies/v2/companies/se";
     private readonly HttpClient _httpClient;
     private readonly string _clientId;
     private readonly string _clientSecret;
@@ -21,13 +21,14 @@ public class DoBHttpClient : IDoBHttpClient
     {
         _httpClient = httpClient;
 
-        _clientId = configuration["Bisnode:ClientId"] ?? throw new InvalidOperationException("Bisnode:ClientId saknas.");
-
-        _clientSecret = configuration["Bisnode:ClientSecret"] ?? throw new InvalidOperationException("Bisnode:ClientSecret saknas.");
+        _clientId = GetRequiredConfigurationValue(configuration, "Bisnode:ClientId");
+        _clientSecret = GetRequiredConfigurationValue(configuration, "Bisnode:ClientSecret");
     }
 
     public async Task<CompanyInformationRoot> GetCompanyInformation(string registrationNumber, CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(registrationNumber);
+
         var accessToken = await GetAccessToken(cancellationToken);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, BisnodeCompanyInformationEndpoint);
@@ -40,10 +41,11 @@ public class DoBHttpClient : IDoBHttpClient
             segments = Segments
         });
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonConvert.DeserializeObject<CompanyInformationRoot>(json) ?? throw new InvalidOperationException("Kunde inte läsa CompanyInformation-svaret.");
+        return JsonConvert.DeserializeObject<CompanyInformationRoot>(json)
+            ?? throw new InvalidOperationException("Kunde inte läsa CompanyInformation-svaret.");
     }
 
 
@@ -59,14 +61,25 @@ public class DoBHttpClient : IDoBHttpClient
             ["scope"] = "credit_data_companies"
         });
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        using var response = await _httpClient.SendAsync(request, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
 
-        var tokenResponse = JsonConvert.DeserializeObject<DoBTokenResponse>(json) ?? throw new InvalidOperationException("Kunde inte läsa token-svaret.");
+        var tokenResponse = JsonConvert.DeserializeObject<DoBTokenResponse>(json)
+            ?? throw new InvalidOperationException("Kunde inte läsa token-svaret.");
 
-        return tokenResponse.access_token ?? throw new InvalidOperationException("access_token saknas i token-svaret.");
+        return tokenResponse.AccessToken
+            ?? throw new InvalidOperationException("access_token saknas i token-svaret.");
+    }
+
+    private static string GetRequiredConfigurationValue(IConfiguration configuration, string key)
+    {
+        var value = configuration[key];
+
+        return !string.IsNullOrWhiteSpace(value)
+            ? value
+            : throw new InvalidOperationException($"{key} saknas.");
     }
 }

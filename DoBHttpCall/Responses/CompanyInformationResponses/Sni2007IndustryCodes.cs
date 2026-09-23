@@ -1,8 +1,9 @@
-﻿namespace DoBHttpCall.Responses.CompanyInformationResponses;
+namespace DoBHttpCall.Responses.CompanyInformationResponses;
 
 public class Sni2007IndustryCodes
 {
-    public PrimaryIndustryCode? primaryIndustryCode { get; set; }
+    [Newtonsoft.Json.JsonProperty("primaryIndustryCode")]
+    public PrimaryIndustryCode? PrimaryIndustryCode { get; set; }
     public List<object>? OtherIndustryCodes { get; set; }
 }
 

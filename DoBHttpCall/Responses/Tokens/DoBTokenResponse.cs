@@ -1,9 +1,16 @@
-﻿namespace DoBHttpCall.Responses.Tokens;
+namespace DoBHttpCall.Responses.Tokens;
 
-public class DoBTokenResponse
+public sealed class DoBTokenResponse
 {
-    public string? access_token  { get; set; }
-    public string? scope  { get; set; }
-    public string? token_type  { get; set; }
-    public int? expires_in { get; set; }
+    [Newtonsoft.Json.JsonProperty("access_token")]
+    public string? AccessToken { get; set; }
+
+    [Newtonsoft.Json.JsonProperty("scope")]
+    public string? Scope { get; set; }
+
+    [Newtonsoft.Json.JsonProperty("token_type")]
+    public string? TokenType { get; set; }
+
+    [Newtonsoft.Json.JsonProperty("expires_in")]
+    public int? ExpiresIn { get; set; }
 }
