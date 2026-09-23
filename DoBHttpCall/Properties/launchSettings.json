@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "DoBHttpCall": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
